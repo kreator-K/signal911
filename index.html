@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b1220" />
+  <meta name="description" content="Signal911 is a guided, synthetic 911 call surge triage prototype for identifying duplicate reports and high-priority updates." />
+  <title>Signal911 | Incident intelligence demo</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Main navigation">
+      <a class="brand" href="#dashboard" aria-label="Signal911 home">
+        <span class="brand-symbol" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span><strong>signal<span class="brand-numbers">911</span></strong><small>INCIDENT INTELLIGENCE</small></span>
+      </a>
+      <div class="nav-group-label">WORKSPACE</div>
+      <nav class="side-nav" aria-label="Workspace">
+        <button type="button" data-view="dashboard" class="nav-link active"><span class="nav-icon">▦</span> Triage dashboard</button>
+        <button type="button" data-view="incidents" class="nav-link"><span class="nav-icon">◎</span> Incident board <span class="nav-counter" id="navIncidentCount">1</span></button>
+        <button type="button" data-view="audit" class="nav-link"><span class="nav-icon">≡</span> Decision log</button>
+      </nav>
+      <div class="side-spacer"></div>
+      <div class="sidebar-panel">
+        <div class="side-panel-top"><span class="status-dot"></span> SYSTEM SIMULATION</div>
+        <strong>No live 911 connection</strong>
+        <p>All callers, addresses, incident data and decisions are fictional.</p>
+      </div>
+      <div class="sidebar-foot">HACKATHON PROTOTYPE <span>v1.0</span></div>
+    </aside>
+
+    <div class="main-column">
+      <header class="topbar">
+        <div class="topbar-location"><span class="breadcrumb-muted">Operations</span><span class="breadcrumb-slash">/</span><strong>Surge response</strong></div>
+        <div class="topbar-actions">
+          <span class="demo-pill"><span class="live-dot"></span> DEMO MODE</span>
+          <button class="btn btn-quiet" id="resetButton" type="button" title="Reset synthetic scenario">↺ <span>Reset</span></button>
+          <button class="btn btn-primary" id="autoButton" type="button">▶ <span>Auto-play scenario</span></button>
+        </div>
+      </header>
+
+      <main id="dashboardView" class="view is-active" aria-label="Triage dashboard">
+        <section class="page-heading">
+          <div><div class="eyebrow"><span class="eyebrow-line"></span> EMERGENCY COMMUNICATIONS / DEMO</div><h1>Find the signal.<br /><span>Not just the duplicates.</span></h1><p>Two decisions for every report: <strong>Does it match an active incident?</strong> <strong>Does it require immediate attention?</strong></p></div>
+          <div class="heading-illustration" aria-hidden="true"><div class="radar radar-outer"></div><div class="radar radar-mid"></div><div class="radar radar-inner"></div><span class="radar-center">✳</span><span class="radar-point point-1"></span><span class="radar-point point-2"></span><span class="radar-point point-3"></span></div>
+        </section>
+
+        <section class="scenario-bar" aria-label="Guided scenario">
+          <div class="scenario-caption"><span class="scenario-icon">⌁</span><div><span class="micro-label">GUIDED INCIDENT SURGE</span><strong id="scenarioTitle">Ready to simulate a call surge</strong><p id="scenarioDescription">One active structure fire. Five incoming reports. Follow each classification and dispatcher decision.</p></div></div>
+          <div class="scenario-controls"><span class="scenario-progress" id="scenarioProgress">0 OF 5 REPORTS</span><button class="btn btn-outline" id="nextCallButton" type="button">Start first call <span>→</span></button></div>
+        </section>
+        <div class="progress-track" aria-label="Scenario progress"><div class="progress-fill" id="progressFill"></div></div>
+
+        <section class="metrics" aria-label="Current scenario metrics">
+          <div class="metric"><div class="metric-label">RECEIVED REPORTS <span class="metric-mark">↗</span></div><div class="metric-number" id="metricReports">0</div><div class="metric-sub">Since surge simulation began</div></div>
+          <div class="metric"><div class="metric-label">POSSIBLE DUPLICATES <span class="metric-mark">≋</span></div><div class="metric-number" id="metricDuplicates">0</div><div class="metric-sub">Matched to an active incident</div></div>
+          <div class="metric metric-alert"><div class="metric-label">URGENT SIGNALS <span class="metric-mark">!</span></div><div class="metric-number" id="metricUrgent">0</div><div class="metric-sub">Require immediate review</div></div>
+          <div class="metric"><div class="metric-label">AWAITING REVIEW <span class="metric-mark">◷</span></div><div class="metric-number" id="metricPending">0</div><div class="metric-sub">Human decision required</div></div>
+        </section>
+
+        <div class="dashboard-grid">
+          <section class="panel feed-panel" aria-label="Incoming 911 reports">
+            <div class="panel-titlebar"><div><div class="panel-title"><span class="title-icon">≡</span> Incoming reports <span class="panel-count" id="feedCount">0</span></div><p>Reports are never auto-merged or silently discarded.</p></div><div class="filter-row"><button data-filter="all" class="filter active" type="button">All</button><button data-filter="pending" class="filter" type="button">Needs review</button><button data-filter="urgent" class="filter" type="button">Urgent</button></div></div>
+            <div class="report-list" id="reportList" aria-live="polite"><div class="empty-state"><div class="empty-icon">◎</div><strong>Waiting for the first call</strong><p>Start the scenario to see how incoming reports are classified.</p></div></div>
+          </section>
+
+          <section class="panel review-panel" aria-label="Dispatcher review">
+            <div class="panel-titlebar"><div><div class="panel-title"><span class="title-icon">◈</span> Dispatcher review</div><p>Evidence first. Human decision always.</p></div><span class="review-indicator" id="reviewIndicator">NO SELECTION</span></div>
+            <div id="reviewContent" class="review-content"><div class="empty-state review-empty"><div class="empty-icon">◇</div><strong>Select an incoming report</strong><p>Matching evidence, urgency signals, and review actions appear here.</p></div></div>
+          </section>
+        </div>
+
+        <div class="lower-grid">
+          <section class="panel slim-panel"><div class="lower-title"><span class="title-icon">◎</span> Active incidents <button class="text-button" type="button" data-goto="incidents">View board →</button></div><div class="compact-incidents" id="compactIncidents"></div></section>
+          <section class="panel slim-panel"><div class="lower-title"><span class="title-icon">≡</span> Latest decisions <button class="text-button" type="button" data-goto="audit">Full log →</button></div><div class="mini-log" id="miniLog"></div></section>
+        </div>
+        <footer class="disclaimer">DEMONSTRATION ONLY · Rule-based synthetic classification, not a certified emergency communications system. Real dispatch requires trained personnel, approved protocols, testing and integration.</footer>
+      </main>
+
+      <main id="incidentsView" class="view secondary-view" aria-label="Incident board"><div class="eyebrow">OPERATIONS / INCIDENT BOARD</div><div class="secondary-header"><div><h1>Incident board</h1><p>Distinct incidents and their linked reports in one place.</p></div><button class="btn btn-outline" type="button" data-goto="dashboard">← Back to triage</button></div><div id="incidentBoard" class="incident-board"></div></main>
+      <main id="auditView" class="view secondary-view" aria-label="Decision log"><div class="eyebrow">OPERATIONS / AUDIT TRAIL</div><div class="secondary-header"><div><h1>Decision log</h1><p>What the system suggested, what the operator chose, and why.</p></div><button class="btn btn-outline" type="button" data-goto="dashboard">← Back to triage</button></div><div class="panel"><div id="fullLog" class="full-log"></div></div></main>
+    </div>
+  </div>
+  <div class="toast-region" id="toastRegion" aria-live="assertive"></div>
+  <script src="./src/engine.js"></script>
+  <script src="./src/app.js"></script>
+</body>
+</html>
